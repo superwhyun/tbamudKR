@@ -18,6 +18,32 @@ send_to_chars() 함수가 사용자에게 메시지를 보내는 함수로 보�
 - 번역 품질은 파파고 승
 - 두 API 모두 유료이며, 무료로 사용할 수 있는 부분은 매우 한정적
 - 웹페이지 번역이 가능하므로 파파고 이용하는 것으로 결정
+- 하려 하였으나...
+
+### KAKAO Translation AIP
+- 아직 무료다.
+- 얘로 하자.
+
+### Papago vs Kakao 
+
+번역 품질은 Papago 압승인 듯?
+
+- 원문 
+
+he river is deep, and runs swiftly in an east-west direction.  To the north the river eddies and enters a backwash where a small bank extends down from a dark, thick stand of trees.  It doesn't look particularly inviting however
+
+
+- Papago
+
+{'message': {'@type': 'response', '@service': 'naverservice.nmt.proxy', '@version': '1.0.0', 'result': {'srcLangType': 'en', 'tarLangType': 'ko', 'translatedText': '강은 깊고, 동서쪽으로 빠르게 흐른다. 북쪽으로는 강물이 소용돌이치며 작은 둑이 어둡고 두꺼운 나무 받침대에서 아래로 뻗어나가는 역세차 속으로 들어간다. 하지만 특별히 매력적으로 보이지는 않는다.'}}}
+
+
+- Kakao
+
+{"translated_text":[["강은 깊고 동서 방향으로 빠르게 흐릅니다.","북쪽으로는 강이 소용돌이 치며 작은 은행이 어둡고 두꺼운 나무 스탠드에서 뻗어있는 역류로 들어갑니다.","하지만 특별히 초대하는 것 같지는 않다"]]}
+
+
+
 
 
 ## 관련 자료
