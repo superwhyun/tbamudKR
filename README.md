@@ -7,9 +7,9 @@
 ### Wolrd 파일
 lib/world/wld/ 디렉토리 밑에 world(room) 파일들이 있음.
 
-### User Interface Source codes
-
-
+### User Interface Source Codes
+send_to_chars() 함수가 사용자에게 메시지를 보내는 함수로 보임.
+이 함수에서 string argument를 끄집어 내어 번역한 후 다시 집어넣어 컴파일.
 
 ## 번역 API 선택
 
