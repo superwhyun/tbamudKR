@@ -52,10 +52,14 @@ URL 번역 | 지원 | 지원 | 미지원
 
 ## 번역 API Quota 회피하기
 
-음. 이렇게 하면 될것 같긴 했는데, 역시 선각자들은 어디에나 있는 법.
-https://github.com/animikhaich/Python-Google-Translate/blob/master/Python%20Google%20Translate/GoogleTranslate_Selenium.py
+웹브라우저 테스트 툴킷으로 만들어진 셀레니움을 이용하는 방법을 사용함. 아래 github 링크의 내용대로 하면 안되어서 참고만 해서 새로 만듬.
+구글에서 번역결과물이 표시되는 곳의 tag id, class등을 모두 null로 해 놓아서 response에서 번역결과물을 얻기 위해 Xpath로 직접 찾아들어가는 방법 사용함.
+해당 Xpath는 크롬->보기->개발자도구 를 이용하면 찾을 수 있음. 
+- https://github.com/animikhaich/Python-Google-Translate/blob/master/Python%20Google%20Translate/GoogleTranslate_Selenium.py
+- https://selenium-python.readthedocs.io/locating-elements.html
 
 
+**TODO** 구글 번역이 쪼끔 구리다. 파파고로 함 다시 해봐야겠다.
 
 ## 관련 자료
 
