@@ -4,7 +4,7 @@
 
 ## 현재 진행 상황
 
-- 번역완료
+- 번역기능 개발완료 (번역 API quota 부족...)
   - lib/world/wld/\*.wld
     - room data
 
