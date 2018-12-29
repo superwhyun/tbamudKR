@@ -2,14 +2,23 @@
 
 일일이 번역하기에는 시간이 너무 소모되고, volunteer들을 이용하면 비효율적이라 인공지능 번역엔진을 이용해 보기로 함.
 
-## 한글화가 필요한 부분
+## 현재 진행 상황
 
-### Wolrd 파일
-lib/world/wld/ 디렉토리 밑에 world(room) 파일들이 있음.
+- 번역완료
+  - lib/world/wld/\*.wld
+    - room data
 
-### User Interface Source Codes
+- 진행예정
+  - lib/world/shp/\*.shp
+    - shop data
+  - lib/world/mob/\*.mob
+    - mob data
+
+## Future TODO
+- User Interface Source Codes
 send_to_chars() 함수가 사용자에게 메시지를 보내는 함수로 보임.
 이 함수에서 string argument를 끄집어 내어 번역한 후 다시 집어넣어 컴파일.
+요놈은 시간을 솔찮이 잡아먹을 듯.. 아닐라나..
 
 ## 번역 API 선택
 
@@ -17,14 +26,15 @@ send_to_chars() 함수가 사용자에게 메시지를 보내는 함수로 보�
 
 . | Google | Naver | Kakao
 ----|------- | ------|------
-Quality | 3  | 1 | 2
+Quality | 대동소이 | 대동소이 | 대동소이
 Price | High  | High | Free
 무료지원 | n/a  | 10,000자/day | 아직까진 무제한
 URL 번역 | 지원 | 지원 | 미지원
 
-### Papago vs Kakao 
 
-번역 품질 비교
+### 번역 품질 비교
+
+다 고만고만하다. 품질의 일관성(존댓말, 반말)은 구글과 네이버가 좋았고, 카카오는 섞여 나오는 경향이 있다. 아마 학습시킨 데이터에 반말/존댓말이 섞인 모양이다. 무료로 제공해 주는게 어딘가. 쌩유~ 카카오!
 
 - 원문 
 
