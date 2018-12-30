@@ -70,7 +70,10 @@ class SeleniumTranslate():
     def __init__(self):
         self.driver = webdriver.Chrome('./webDriver/chromedriver')
 
-    def translate(self, query, language):
+    def translate(self, query):
+        return self.translate_with_lang(query, 'ko')
+
+    def translate_with_lang(self, query, language):
 
         if(len(query)<=1): return ''
         myLang = language.lower()
@@ -90,16 +93,17 @@ class SeleniumTranslate():
         time.sleep(1)
         err_cnt=0
         while(True):
-            try:                
+            try:           
                 text_output = self.driver.find_element_by_xpath(xpath)
             except:
-                print('translating...'+query+' failed' + '(' + str(err_cnt) + ')')
+                # print('retrying' + '(' + str(err_cnt) + ')')
                 err_cnt+=1
 
                 if(err_cnt > 5):
                     # If the string is too much long, google translate returns with slightly different way
                     xpath='/html/body/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div/span[1]'
                 if(err_cnt > 10):
+                    print('[ERROR] Translation : 10 Retries has been failed')
                     return '[[[[[[[[TRANSLATION FAILED]]]]]]]]]]'
 
                 time.sleep(1)
@@ -128,10 +132,6 @@ class SeleniumTranslate():
     
 #     driver.quit()
 
-translator=SeleniumTranslate()
-
-def Translate(input):
-    return translator.translate(input, 'ko')
 
 
 
@@ -145,7 +145,6 @@ class WorldFileHandler:
         self.path=path
         self.fp = None
         pass
-
 
     def fread_string(self):
         ret_str = ""
@@ -165,9 +164,7 @@ class WorldFileHandler:
 
         return ret_str
 
-    def read_world_files(self):
-        files=listdir(self.path)
-        return files
+
     
     def parse_room_field(self, room_number):
         room_info=dict()
@@ -208,25 +205,30 @@ class WorldFileHandler:
             print('world info is not ready. parse first')
             return
 
+        translator = SeleniumTranslate()
+        print('processing ' + ofname + 'by ' + str(id(translator)) )
         ofp = open(ofname, "w")
 
         for room in self.world_info:
+
+            
             ofp.write('#'+room['number']+"\n")
 
             if(translate): 
-                ofp.write(Translate(room['name'])+'~'+"\n")
-                ofp.write(Translate(room['description'])+'\n'+'~'+"\n")
+                print('\t translating ' + room['number'] + ' by ' + str(id(translator))+ ' to ' + ofname)
+                ofp.write(translator.translate(room['name'])+'~'+"\n")
+                ofp.write(translator.translate(room['description'])+'\n'+'~'+"\n")
             else:          
                 ofp.write(room['name']+'~'+"\n")
                 ofp.write(room['description']+'\n'+'~'+"\n")
             ofp.write(room['roomflag']+'\n')
-
+            
             if('direction' in room):
                 for dir in room['direction']:
                     ofp.write(dir['direction_number']+'\n')
                     if(translate):
                         if(len(dir['direction_description'])>1):
-                            ofp.write(Translate(dir['direction_description'])+'\n'+'~'+'\n')
+                            ofp.write(translator.translate(dir['direction_description'])+'\n'+'~'+'\n')
                         else:
                             ofp.write('~'+'\n')
                     else:
@@ -241,7 +243,7 @@ class WorldFileHandler:
 
                     if(translate):
                         if(len(extra['descriptions'])>1):
-                            ofp.write(Translate(extra['descriptions'])+'\n'+'~'+'\n')
+                            ofp.write(translator.translate(extra['descriptions'])+'\n'+'~'+'\n')
                         else:
                             ofp.write('~'+'\n')
                     else:
@@ -255,6 +257,8 @@ class WorldFileHandler:
         ofp.write('$~')
 
         ofp.close()
+        print('completed')
+        translator.quit()
         return True
 
 
@@ -262,7 +266,7 @@ class WorldFileHandler:
 
     def parse_world_file(self, ifname):
 
-        print('parsing ' + ifname + '.....')
+        # print('parsing ' + ifname + '.....')
         fname = self.path + ifname
         self.fp = open(fname, "r")
         if(self.fp is None): return None
@@ -299,7 +303,7 @@ class WorldFileHandler:
                     roominfo['trigger']=line
 
             elif(line.startswith('$~')): 
-                print('.........ok')
+                # print('.........ok')
                 loop=False
 
             else:
@@ -307,6 +311,10 @@ class WorldFileHandler:
             
 
 import subprocess
+import threading
+import sys
+import util_threadpool as tp
+from time import sleep    
 
 if __name__ == "__main__":
     
@@ -314,9 +322,11 @@ if __name__ == "__main__":
     ipath = '../lib/world/wld/'
     opath = '../lib/world/wld_ko/'
 
-    wldHandler = WorldFileHandler(ipath)
-    files=wldHandler.read_world_files()
-    cnt=0
+    number_of_instance = 5
+    pool = tp.ThreadPool(number_of_instance)
+
+    
+    files=listdir(ipath)
     for file in files:
 
         ofile = opath+file
@@ -326,15 +336,21 @@ if __name__ == "__main__":
         except:
             line = 'ok'
             
-        
-
         # Skip already finished files even though this application is restarted.
         if( line != '$~' and line != '$~\n'):
+            wldHandler = WorldFileHandler(ipath)
             wldHandler.parse_world_file(file)
-            wldHandler.save_world_file('../lib/world/wld_ko/'+file, translate=True)
+            # print('translating '+file)
+            pool.add_task(wldHandler.save_world_file, '../lib/world/wld_ko/'+file, translate=True)
+            sleep(1)
+
+        else:
+            print('skipping '+file)
+    
+    pool.wait_completion()    
 
     print("Jobs done!")    
-    translator.quit()
+    
         # cnt+=1
         # if(cnt==1): break
 
