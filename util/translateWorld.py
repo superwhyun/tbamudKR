@@ -81,20 +81,33 @@ class SeleniumTranslate():
         from_lang = 'en'
         final_url = base_url + from_lang + '/' + myLang
         xpath='/html/body/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div/span[1]/span'
-
+               
 
         # Perform operation to detect the translated text
         self.driver.set_page_load_timeout(30)        # Incase Page doesn't load
         self.driver.get(final_url)                   # Search the URL
         self.driver.find_element_by_id('source').send_keys(query.lower()) 
-        time.sleep(2)
+        time.sleep(1)
+        err_cnt=0
         while(True):
-            try:
+            try:                
                 text_output = self.driver.find_element_by_xpath(xpath)
             except:
-                print('translating...'+query+' failed')
+                print('translating...'+query+' failed' + '(' + str(err_cnt) + ')')
+                err_cnt+=1
+
+                if(err_cnt > 5):
+                    # If the string is too much long, google translate returns with slightly different way
+                    xpath='/html/body/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div/span[1]'
+                if(err_cnt > 10):
+                    return '[[[[[[[[TRANSLATION FAILED]]]]]]]]]]'
+
+                time.sleep(1)
                 continue
                 # return ''
+            else:
+                err_cnt=0
+                xpath='/html/body/div[2]/div[1]/div[2]/div[1]/div[1]/div[2]/div[2]/div[1]/div[2]/div/span[1]/span'
             break
 
         time.sleep(1)   # Else it does not print the data
@@ -212,7 +225,10 @@ class WorldFileHandler:
                 for dir in room['direction']:
                     ofp.write(dir['direction_number']+'\n')
                     if(translate):
-                        ofp.write(Translate(dir['direction_description'])+'\n'+'~'+'\n')
+                        if(len(dir['direction_description'])>1):
+                            ofp.write(Translate(dir['direction_description'])+'\n'+'~'+'\n')
+                        else:
+                            ofp.write('~'+'\n')
                     else:
                         ofp.write(dir['direction_description']+'\n'+'~'+'\n')
                     ofp.write(dir['direction_keyword']+'~'+'\n')
@@ -221,11 +237,13 @@ class WorldFileHandler:
             if('extra' in room):
                 for extra in room['extra']:
                     ofp.write('E'+'\n')
-                    
                     ofp.write(extra['keywords']+'~'+'\n')
 
                     if(translate):
-                        ofp.write(Translate(extra['descriptions'])+'\n'+'~'+'\n')
+                        if(len(extra['descriptions'])>1):
+                            ofp.write(Translate(extra['descriptions'])+'\n'+'~'+'\n')
+                        else:
+                            ofp.write('~'+'\n')
                     else:
                         ofp.write(extra['descriptions']+'\n'+'~'+'\n')
 
@@ -288,17 +306,32 @@ class WorldFileHandler:
                 print("ERROR : " + str(line_cnt)+" "+line)
             
 
+import subprocess
+
 if __name__ == "__main__":
     
 
-    path = '../lib/world/wld/'
-    wldHandler = WorldFileHandler(path)
+    ipath = '../lib/world/wld/'
+    opath = '../lib/world/wld_ko/'
 
+    wldHandler = WorldFileHandler(ipath)
     files=wldHandler.read_world_files()
     cnt=0
     for file in files:
-        wldHandler.parse_world_file(file)
-        wldHandler.save_world_file('../lib/world/wld_ko/'+file, translate=True)
+
+        ofile = opath+file
+        try:
+            line = subprocess.check_output(['tail', '-1', ofile])
+            line = line.decode("utf-8") 
+        except:
+            line = 'ok'
+            
+        
+
+        # Skip already finished files even though this application is restarted.
+        if( line != '$~' and line != '$~\n'):
+            wldHandler.parse_world_file(file)
+            wldHandler.save_world_file('../lib/world/wld_ko/'+file, translate=True)
 
     print("Jobs done!")    
     translator.quit()
